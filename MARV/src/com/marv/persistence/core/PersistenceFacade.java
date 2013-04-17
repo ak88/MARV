@@ -2,7 +2,11 @@ package com.marv.persistence.core;
 
 import java.util.ArrayList;
 
+import com.marv.business.entities.AuctionItem;
 import com.marv.business.entities.DomainObject;
+import com.marv.business.entities.User;
+import com.marv.persistence.mappers.AuctionItemMapper;
+import com.marv.persistence.mappers.UserMapper;
 
 public class PersistenceFacade implements Cloneable {
 
@@ -15,7 +19,7 @@ public class PersistenceFacade implements Cloneable {
 	
 	private PersistenceFacade() {
 		// private constructor prevents instantiation by untrusted callers
-		mapperFactory = new MapperFactory();
+		mapperFactory = MapperFactory.getInstance();
 	}
 	
 	/**
@@ -52,6 +56,10 @@ public class PersistenceFacade implements Cloneable {
 		return mapperFactory.getMapper(domainObject).insert(domainObject);
 	}
 	
+	public long insertTransaction(DomainObject domainObject) {
+		return mapperFactory.getMapper(domainObject).insertTransaction(domainObject);
+	}
+	
 	/**
 	 * Updates the database record corresponding to the domain object provided in the parameter.
 	 * 
@@ -78,5 +86,16 @@ public class PersistenceFacade implements Cloneable {
 		} else {
 			return update(obj) > 0;
 		}
+	}
+
+	public ArrayList<AuctionItem> findAllAuctionItemsByCategory(long categoryId) {
+		AuctionItemMapper mapper = 
+				(AuctionItemMapper)mapperFactory.getMapper(AuctionItem.class);
+		return mapper.findAllByCategory(categoryId);
+	}
+
+	public User findUserByOpenId(String identifier) {
+		UserMapper mapper = (UserMapper) mapperFactory.getMapper(User.class);
+		return mapper.findByOpenId(identifier);
 	}
 }
